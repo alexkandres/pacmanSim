@@ -39,6 +39,8 @@ public class PacSimReplan implements PacAction {
    @Override
    public PacFace action( Object state ) {
 
+      //2d array of grid
+      //find pacman on the grid
       PacCell[][] grid = (PacCell[][]) state;
       PacmanCell pc = PacUtils.findPacman( grid );
       
