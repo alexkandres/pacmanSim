@@ -66,11 +66,10 @@ public class PacSimRNNA implements PacAction {
         // take the next step on the current path
         //TODO determine next move
 
-//        Point next = path.remove( 0 );
-//        PacFace face = PacUtils.direction( pc.getLoc(), next );
-//        System.out.printf( "%5d : From [ %2d, %2d ] go %s%n", ++simTime, pc.getLoc().x, pc.getLoc().y, face );
-//        return face;
-        return null;
+        Point next = path.remove( 0 );
+        PacFace face = PacUtils.direction( pc.getLoc(), next );
+        System.out.printf( "%5d : From [ %2d, %2d ] go %s%n", ++simTime, pc.getLoc().x, pc.getLoc().y, face );
+        return face;
     }
 
     public List<Point> getRNNASolution(PacCell[][] grid) {
@@ -135,6 +134,9 @@ public class PacSimRNNA implements PacAction {
                 PacFace face = PacUtils.direction( pcPoint, point );
 
                 System.out.println("  Removing ["+point.x+", "+ point.y+"]");
+                if(grid[point.x][point.y] instanceof FoodCell) {
+                    grid[point.x][point.y] = new PacCell(point.x,point.y);
+                }
             }
 
         }
@@ -153,7 +155,28 @@ public class PacSimRNNA implements PacAction {
                 shortest = i;
             }
         }
+
+        for(int i = 0; i < possibleSolution[shortest].size(); i++){
+            System.out.println("NODE "+ i + "," + possibleSolution[shortest].get(i) + "x,y = "+ possibleSolution[shortest].get(i).x +","+possibleSolution[shortest].get(i).y);
+        }
         System.out.println("SHORTEST Found = " + possibleSolution.toString());
+
+        // switch from starting node(ie. [4,3])
+        //if first node is not starting node (ie. 4,3) then shift to the left
+            //remove 1 node then place at the end
+        while(possibleSolution[shortest].get(0).x != 4 || possibleSolution[shortest].get(0).y != 3){
+
+            //shift
+            System.out.println("Shift " + possibleSolution[shortest].get(0));
+            Point point = possibleSolution[shortest].remove(0);
+            possibleSolution[shortest].add(point);
+        }
+
+        Point point = possibleSolution[shortest].remove(0);
+        possibleSolution[shortest].add(point);
+        for(int i = 0; i < possibleSolution[shortest].size(); i++){
+            System.out.println("NODE "+ i + "," + possibleSolution[shortest].get(i)+ "x,y = "+ possibleSolution[shortest].get(i).x +","+possibleSolution[shortest].get(i).y);
+        }
         return possibleSolution[shortest];
     }
 }
