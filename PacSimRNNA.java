@@ -84,12 +84,25 @@ public class PacSimRNNA implements PacAction {
         for(int i = 0; i < allNodes.size(); i++){
             //add each path in arraylist [[],[],..]
             //TODO may need to clone grid for each getPath
-            PacCell[][] gridClone = grid.clone();
-            possibleSolution[i] = getPath(allNodes.get(i),grid);
+            System.out.println("Starting node " + i);
+            PacCell[][] gridClone = gridClone(grid);
+            possibleSolution[i] = getPath(allNodes.get(i),gridClone);
         }
 
         //get lowest path (ie. number of point length [(),()] = 2)
         return bestPath(possibleSolution);
+    }
+
+    private PacCell[][] gridClone(PacCell[][] grid) {
+        System.out.println("Rowwww "+ grid.length+", collll"+grid[0].length);
+        PacCell[][] gridClone = new PacCell[grid.length][grid[0].length];
+
+        for(int i = 0; i < grid.length; i++){
+            for(int j = 0; j < grid[0].length; j++){
+                gridClone[i][j] = grid[i][j].clone();
+            }
+        }
+        return gridClone;
     }
 
     //once per Node/point
@@ -105,7 +118,10 @@ public class PacSimRNNA implements PacAction {
             if(subPath.isEmpty()){
                 Point tgt = PacUtils.nearestFood(point, grid);
                 subPath = BFSPath.getPath(grid, point, tgt);
-
+                //grid[tgt.x][tgt.y] = not food cell
+                if(grid[tgt.x][tgt.y] instanceof FoodCell) {
+                    grid[tgt.x][tgt.y] = new PacCell(tgt.x,tgt.y);
+                }
                 System.out.println("Currently at ["+point.x+", "+point.y+"]");
                 System.out.println("Target at ["+tgt.x+", "+tgt.y+"]");
 
@@ -127,6 +143,17 @@ public class PacSimRNNA implements PacAction {
     }
 
     private List<Point> bestPath(List<Point>[] possibleSolution) {
-        return null;
+
+        //= {
+        //      [(x1y1),..]
+        //      [(x1y2),..] }
+        int shortest = 0;
+        for(int i = 1; i < possibleSolution.length; i++){
+            if(possibleSolution[i].size() < possibleSolution[i-1].size()){
+                shortest = i;
+            }
+        }
+        System.out.println("SHORTEST Found = " + possibleSolution.toString());
+        return possibleSolution[shortest];
     }
 }
