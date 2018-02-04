@@ -179,29 +179,29 @@ public class PacSimRNNA implements PacAction {
     }
 
     private List<Point> getNearestFoods(PathGrid pathGrid) {
-        //this list will be returned
-        List<Point> allNearestFood = new ArrayList<>();
-
-        //find closest food and distance
-//        Point foodPoint = PacUtils.nearestFood(pathGrid.currentPoint, pathGrid.grid);
-//        int shortestDistance = PacUtils.manhattanDistance(pathGrid.currentPoint, foodPoint);
 
         //find all foods
         List<Point> foodListPoint = PacUtils.findFood(pathGrid.grid);
 
-        int shortestDistance = PacUtils.manhattanDistance(pathGrid.currentPoint, foodListPoint.get(0));
+        int shortestDistance = 0;
         //compare each food distance to shortest distance
-        System.out.println("CITYBLOCK " + PacUtils.nearestFood(pathGrid.currentPoint, pathGrid.grid));
-        for(int i = 0; i < foodListPoint.size(); i++){
-            System.out.println("MANHATTANDISTANCE "+PacUtils.manhattanDistance(pathGrid.currentPoint, foodListPoint.get(i)));
-            if (shortestDistance > PacUtils.manhattanDistance(pathGrid.currentPoint, foodListPoint.get(i))){
-                shortestDistance = PacUtils.manhattanDistance(pathGrid.currentPoint, foodListPoint.get(i));
+        for(int i = 1; i < foodListPoint.size(); i++){
+            List<Point> p1 = BFSPath.getPath(pathGrid.grid, pathGrid.currentPoint, foodListPoint.get(i));
+            List<Point> p2 = BFSPath.getPath(pathGrid.grid, pathGrid.currentPoint, foodListPoint.get(shortestDistance));
+
+            if (p1.size() < p2.size()){
+                shortestDistance = i;
 //                System.out.println("NearestFOODS" +foodListPoint.get(i));
             }
         }
 
+        List<Point> shortestPoint = BFSPath.getPath(pathGrid.grid, pathGrid.currentPoint, foodListPoint.get(shortestDistance));
+
+        //this list will be returned
+        List<Point> allNearestFood = new ArrayList<>();
         for(int i = 0; i < foodListPoint.size(); i++){
-            if (shortestDistance == PacUtils.manhattanDistance(pathGrid.currentPoint, foodListPoint.get(i))){
+            List<Point> p1 = BFSPath.getPath(pathGrid.grid, pathGrid.currentPoint, foodListPoint.get(i));
+            if (p1.size() == shortestPoint.size()){
                 allNearestFood.add(foodListPoint.get(i));
                 System.out.println("NEAREST FOODS" +foodListPoint.get(i));
             }
