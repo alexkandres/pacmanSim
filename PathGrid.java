@@ -14,7 +14,7 @@ public class PathGrid {
         this.currentPoint = currentPoint;
     }
 
-    public PathGrid(PacCell[][] grid, List<Point> path, Point currentPoint) {
+    public PathGrid(PacCell[][] grid, Point currentPoint, List<Point> path) {
         this.grid = grid;
         this.path = path;
         this.currentPoint = currentPoint;

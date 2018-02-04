@@ -72,20 +72,42 @@ public class PacSimRNNA implements PacAction {
 
     private List<PathGrid> getPossibleSolutions(PacCell[][] gridClone) {
         List<PathGrid> pathGridList = new ArrayList<>();
-        //TODO change new Point() to be dynamic
+        //TODO change new Point() to be dynamic, add path to constructor
         PathGrid grid = new PathGrid(gridClone, new Point(3,4));
         pathGridList.add(grid);
 
+        //update and expand possible solutions
         while (gridsHaveFood(pathGridList)){
             for(int i = 0; i < pathGridList.size(); i++){
                 if(!PacUtils.foodRemains(pathGridList.get(i).grid)){
                     continue;
                 }
-                //TODO
                 List<Point> allNearestFoods = getNearestFoods(pathGridList.get(i));
+                PathGrid pathGridClone = pathGridClone(pathGridList.get(i));
+
+                //expand first nearest food
+                expand(pathGridList.get(i), allNearestFoods.remove(0));
+
+                //create, expand and add to pathGridList
+                for(int j = 0; j < allNearestFoods.size(); j++){
+                    PathGrid newPathGrid = pathGridClone(pathGridClone);
+                    expand(newPathGrid, allNearestFoods.get(j));
+                    pathGridList.add(newPathGrid);
+                }
+
             }
         }
         return pathGridList;
+    }
+
+    private void expand(PathGrid pathGrid, Point targetPoint) {
+        //TODO
+    }
+
+    private PathGrid pathGridClone(PathGrid pathGrid) {
+        PacCell[][] gridClone = gridClone(pathGrid.grid);
+        PathGrid pathGridClone = new PathGrid(gridClone, pathGrid.currentPoint, pathGrid.path);
+        return pathGridClone;
     }
 
     private List<Point> getNearestFoods(PathGrid pathGrid) {
