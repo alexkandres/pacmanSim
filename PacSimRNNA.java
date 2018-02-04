@@ -99,7 +99,12 @@ public class PacSimRNNA implements PacAction {
         List<Point> initPath = new ArrayList<>();
         //TODO change new Point() to be dynamic, add path to constructor
         PathGrid grid = new PathGrid(gridClone, new Point(4,3), initPath);
-        pathGridList.add(grid);
+        List<Point> allFood = PacUtils.findFood(gridClone);
+        for(int i = 0; i < allFood.size();i++){
+            PathGrid pathGridInit = pathGridClone(grid);
+            expand(pathGridInit, allFood.get(i));
+            pathGridList.add(pathGridInit);
+        }
 
         //update and expand possible solutions
         while (gridsHaveFood(pathGridList)){
