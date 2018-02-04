@@ -81,8 +81,8 @@ public class PacSimRNNA implements PacAction {
         }
 
         //TODO may need to shift left
-        Point point = pathGridList.get(shortest).path.remove(0);
-        pathGridList.get(shortest).path.add(point);
+//        Point point = pathGridList.get(shortest).path.remove(0);
+//        pathGridList.get(shortest).path.add(point);
 
         //printing shortest path
         for(int i = 0; i < pathGridList.get(shortest).path.size(); i++){
@@ -148,8 +148,25 @@ public class PacSimRNNA implements PacAction {
 
     private PathGrid pathGridClone(PathGrid pathGrid) {
         PacCell[][] gridClone = gridClone(pathGrid.grid);
-        PathGrid pathGridClone = new PathGrid(gridClone, pathGrid.currentPoint, pathGrid.path);
+        List<Point> pathClone = pathClone(pathGrid.path);
+        Point pointClone = new Point(pathGrid.currentPoint.x, pathGrid.currentPoint.y);
+
+        //TODO pathGrid.path??? maybe a pointer
+        PathGrid pathGridClone = new PathGrid(gridClone, pointClone, pathClone);
         return pathGridClone;
+    }
+
+    private List<Point> pathClone(List<Point> path) {
+        List<Point> pathCloneList = new ArrayList<>();
+
+        //for ea item place into new list
+        for(int i = 0; i< path.size(); i++){
+            int x = path.get(i).x;
+            int y = path.get(i).y;
+
+            pathCloneList.add(new Point(x,y));
+        }
+        return pathCloneList;
     }
 
     private List<Point> getNearestFoods(PathGrid pathGrid) {
@@ -221,7 +238,6 @@ public class PacSimRNNA implements PacAction {
     private List<Point> getPath(Point point, PacCell[][] grid) {
         List<Point> path = new ArrayList<>();
         List<Point> subPath = new ArrayList<>();
-
         //while no more food left
         while (PacUtils.foodRemains(grid)){
 
