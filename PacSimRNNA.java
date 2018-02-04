@@ -66,8 +66,30 @@ public class PacSimRNNA implements PacAction {
 
         PacCell[][] gridClone = gridClone(grid);
         List<PathGrid> pathGridList = getPossibleSolutions(gridClone);
+        List<Point> bestPath = getBestPath(pathGridList);
 
-        return null;
+        return bestPath;
+    }
+
+    private List<Point> getBestPath(List<PathGrid> pathGridList) {
+        int shortest = 0;
+        //find shortest int the list
+        for(int i = 1; i < pathGridList.size(); i++){
+            if(pathGridList.get(i).path.size() < pathGridList.get(i-1).path.size()){
+                shortest = i;
+            }
+        }
+
+        //TODO may need to shift left
+        Point point = pathGridList.get(shortest).path.remove(0);
+        pathGridList.get(shortest).path.add(point);
+
+        //printing shortest path
+        for(int i = 0; i < pathGridList.get(shortest).path.size(); i++){
+            System.out.println("NODE: " + pathGridList.get(shortest).path.get(i));
+        }
+
+        return pathGridList.get(shortest).path;
     }
 
     private List<PathGrid> getPossibleSolutions(PacCell[][] gridClone) {
@@ -101,7 +123,19 @@ public class PacSimRNNA implements PacAction {
     }
 
     private void expand(PathGrid pathGrid, Point targetPoint) {
-        //TODO
+        List<Point> subPath;
+        subPath = BFSPath.getPath(pathGrid.grid, pathGrid.currentPoint, targetPoint);
+        pathGrid.path.addAll(subPath);
+
+        //mark food as eaten
+        while (!subPath.isEmpty()){
+            Point pcPoint = new Point(pathGrid.currentPoint.x, pathGrid.currentPoint.y);
+            pathGrid.currentPoint = subPath.remove(0);
+            PacFace face = PacUtils.direction(pcPoint, pathGrid.currentPoint);
+            if(pathGrid.grid[pathGrid.currentPoint.x][pathGrid.currentPoint.y] instanceof FoodCell){
+                pathGrid.grid[pathGrid.currentPoint.x][pathGrid.currentPoint.y] = new PacCell(pathGrid.currentPoint.x, pathGrid.currentPoint.y);
+            }
+        }
     }
 
     private PathGrid pathGridClone(PathGrid pathGrid) {
