@@ -72,7 +72,7 @@ public class PacSimRNNA implements PacAction {
 
     private List<PathGrid> getPossibleSolutions(PacCell[][] gridClone) {
         List<PathGrid> pathGridList = new ArrayList<>();
-        //TODO change new Point()
+        //TODO change new Point() to be dynamic
         PathGrid grid = new PathGrid(gridClone, new Point(3,4));
         pathGridList.add(grid);
 
@@ -81,15 +81,31 @@ public class PacSimRNNA implements PacAction {
                 if(!PacUtils.foodRemains(pathGridList.get(i).grid)){
                     continue;
                 }
-                List<Point> allNearestFoods = getNearestFoods(pathGridList.get(i).grid);
+                //TODO
+                List<Point> allNearestFoods = getNearestFoods(pathGridList.get(i));
             }
         }
-        return null;
+        return pathGridList;
     }
 
-    private List<Point> getNearestFoods(PacCell[][] grid) {
-        List<Point> foodListPoint = PacUtils.findFood(grid);
-        return null;
+    private List<Point> getNearestFoods(PathGrid pathGrid) {
+        //this list will be returned
+        List<Point> allNearestFood = new ArrayList<>();
+
+        //find closest food and distance
+        Point foodPoint = PacUtils.nearestFood(pathGrid.currentPoint, pathGrid.grid);
+        int shortestDistance = PacUtils.manhattanDistance(pathGrid.currentPoint, foodPoint);
+
+        //find all foods
+        List<Point> foodListPoint = PacUtils.findFood(pathGrid.grid);
+
+        //compare each food distance to shortest distance
+        for(int i = 0; i < foodListPoint.size(); i++){
+            if (shortestDistance == PacUtils.manhattanDistance(pathGrid.currentPoint, foodListPoint.get(i))){
+                allNearestFood.add(foodListPoint.get(i));
+            }
+        }
+        return allNearestFood;
     }
 
     private boolean gridsHaveFood(List<PathGrid> pathGridList) {
