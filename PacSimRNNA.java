@@ -74,7 +74,9 @@ public class PacSimRNNA implements PacAction {
     private List<Point> getBestPath(List<PathGrid> pathGridList) {
         int shortest = 0;
         //find shortest int the list
+        System.out.println("PATHSIZE: "+pathGridList.get(0).path.size());
         for(int i = 1; i < pathGridList.size(); i++){
+            System.out.println("PATHSIZE: "+pathGridList.get(i).path.size());
             if(pathGridList.get(i).path.size() < pathGridList.get(i-1).path.size()){
                 shortest = i;
             }
