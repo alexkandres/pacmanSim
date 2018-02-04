@@ -33,11 +33,8 @@ public class PacSimRNNA implements PacAction {
     }
 
     //called every time pacman moves (one pixel?)
-    //TODO Implement RNNA here
     @Override
     public PacFace action(Object state) {
-
-        //TODO compute RNNA path
 
         //2d array of grid
         //find pacman on the grid
@@ -51,26 +48,71 @@ public class PacSimRNNA implements PacAction {
         // if current path completed (or just starting out),
         // select a the nearest food using the city-block
         // measure and generate a path to that target
-
-        //TODO RNNA solution
         if( path.isEmpty() ) {
-//            Point tgt = PacUtils.nearestFood( pc.getLoc(), grid);
-//            //path = [(x1,y1),(x2,y2)]
-//            path = BFSPath.getPath(grid, pc.getLoc(), tgt);
-//
-//            System.out.println("Pac-Man currently at: [ " + pc.getLoc().x + ", " + pc.getLoc().y + " ]");
-//            System.out.println("Setting new target  : [ " + tgt.x + ", " + tgt.y + " ]");
-            path = getRNNASolution(grid);
+            path = getRNNASolutionBranch(grid);
         }
 
         // take the next step on the current path
-        //TODO determine next move
-
         Point next = path.remove( 0 );
         PacFace face = PacUtils.direction( pc.getLoc(), next );
         System.out.printf( "%5d : From [ %2d, %2d ] go %s%n", ++simTime, pc.getLoc().x, pc.getLoc().y, face );
         return face;
     }
+
+    private List<Point> getRNNASolutionBranch(PacCell[][] grid) {
+
+
+        allNodes = PacUtils.findFood(grid);
+
+        PacCell[][] gridClone = gridClone(grid);
+        List<PathGrid> pathGridList = getPossibleSolutions(gridClone);
+
+        return null;
+    }
+
+    private List<PathGrid> getPossibleSolutions(PacCell[][] gridClone) {
+        List<PathGrid> pathGridList = new ArrayList<>();
+        //TODO change new Point()
+        PathGrid grid = new PathGrid(gridClone, new Point(3,4));
+        pathGridList.add(grid);
+
+        while (gridsHaveFood(pathGridList)){
+            for(int i = 0; i < pathGridList.size(); i++){
+                if(!PacUtils.foodRemains(pathGridList.get(i).grid)){
+                    continue;
+                }
+                List<Point> allNearestFoods = getNearestFoods(pathGridList.get(i).grid);
+            }
+        }
+        return null;
+    }
+
+    private List<Point> getNearestFoods(PacCell[][] grid) {
+        List<Point> foodListPoint = PacUtils.findFood(grid);
+        return null;
+    }
+
+    private boolean gridsHaveFood(List<PathGrid> pathGridList) {
+
+        //for each pathgrid.grid check if
+        for(int i = 0; i < pathGridList.size(); i++){
+            if(PacUtils.foodRemains(pathGridList.get(i).grid)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     public List<Point> getRNNASolution(PacCell[][] grid) {
         //TODO put start at each of these nodes
@@ -92,17 +134,7 @@ public class PacSimRNNA implements PacAction {
         return bestPath(possibleSolution);
     }
 
-    private PacCell[][] gridClone(PacCell[][] grid) {
-        System.out.println("Rowwww "+ grid.length+", collll"+grid[0].length);
-        PacCell[][] gridClone = new PacCell[grid.length][grid[0].length];
 
-        for(int i = 0; i < grid.length; i++){
-            for(int j = 0; j < grid[0].length; j++){
-                gridClone[i][j] = grid[i][j].clone();
-            }
-        }
-        return gridClone;
-    }
 
     //once per Node/point
     private List<Point> getPath(Point point, PacCell[][] grid) {
@@ -115,6 +147,9 @@ public class PacSimRNNA implements PacAction {
             //get nearest food and set path
             //add subPath to overall path
             if(subPath.isEmpty()){
+                //TODO maybe more than one closest food
+                //get list of closest foods
+                //for each, try a path on them
                 Point tgt = PacUtils.nearestFood(point, grid);
                 subPath = BFSPath.getPath(grid, point, tgt);
                 //grid[tgt.x][tgt.y] = not food cell
@@ -178,5 +213,17 @@ public class PacSimRNNA implements PacAction {
             System.out.println("NODE "+ i + "," + possibleSolution[shortest].get(i)+ "x,y = "+ possibleSolution[shortest].get(i).x +","+possibleSolution[shortest].get(i).y);
         }
         return possibleSolution[shortest];
+    }
+
+    private PacCell[][] gridClone(PacCell[][] grid) {
+        System.out.println("Rowwww "+ grid.length+", collll"+grid[0].length);
+        PacCell[][] gridClone = new PacCell[grid.length][grid[0].length];
+
+        for(int i = 0; i < grid.length; i++){
+            for(int j = 0; j < grid[0].length; j++){
+                gridClone[i][j] = grid[i][j].clone();
+            }
+        }
+        return gridClone;
     }
 }
