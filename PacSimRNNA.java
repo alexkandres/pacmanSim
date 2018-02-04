@@ -64,7 +64,7 @@ public class PacSimRNNA implements PacAction {
 
         allNodes = PacUtils.findFood(grid);
 
-        PacCell[][] gridClone = gridClone(grid);
+        PacCell[][] gridClone = PacUtils.cloneGrid(grid);
         List<PathGrid> pathGridList = getPossibleSolutions(gridClone);
         List<Point> bestPath = getBestPath(pathGridList);
 
@@ -149,7 +149,7 @@ public class PacSimRNNA implements PacAction {
     }
 
     private PathGrid pathGridClone(PathGrid pathGrid) {
-        PacCell[][] gridClone = gridClone(pathGrid.grid);
+        PacCell[][] gridClone = PacUtils.cloneGrid(pathGrid.grid);
         List<Point> pathClone = pathClone(pathGrid.path);
         Point pointClone = new Point(pathGrid.currentPoint.x, pathGrid.currentPoint.y);
 
@@ -176,17 +176,27 @@ public class PacSimRNNA implements PacAction {
         List<Point> allNearestFood = new ArrayList<>();
 
         //find closest food and distance
-        Point foodPoint = PacUtils.nearestFood(pathGrid.currentPoint, pathGrid.grid);
-        int shortestDistance = PacUtils.manhattanDistance(pathGrid.currentPoint, foodPoint);
+//        Point foodPoint = PacUtils.nearestFood(pathGrid.currentPoint, pathGrid.grid);
+//        int shortestDistance = PacUtils.manhattanDistance(pathGrid.currentPoint, foodPoint);
 
         //find all foods
         List<Point> foodListPoint = PacUtils.findFood(pathGrid.grid);
 
+        int shortestDistance = PacUtils.manhattanDistance(pathGrid.currentPoint, foodListPoint.get(0));
         //compare each food distance to shortest distance
+        System.out.println("CITYBLOCK " + PacUtils.nearestFood(pathGrid.currentPoint, pathGrid.grid));
+        for(int i = 0; i < foodListPoint.size(); i++){
+            System.out.println("MANHATTANDISTANCE "+PacUtils.manhattanDistance(pathGrid.currentPoint, foodListPoint.get(i)));
+            if (shortestDistance > PacUtils.manhattanDistance(pathGrid.currentPoint, foodListPoint.get(i))){
+                shortestDistance = PacUtils.manhattanDistance(pathGrid.currentPoint, foodListPoint.get(i));
+//                System.out.println("NearestFOODS" +foodListPoint.get(i));
+            }
+        }
+
         for(int i = 0; i < foodListPoint.size(); i++){
             if (shortestDistance == PacUtils.manhattanDistance(pathGrid.currentPoint, foodListPoint.get(i))){
                 allNearestFood.add(foodListPoint.get(i));
-                System.out.println("NearestFOODS" +foodListPoint.get(i));
+                System.out.println("NEAREST FOODS" +foodListPoint.get(i));
             }
         }
         return allNearestFood;
@@ -226,7 +236,7 @@ public class PacSimRNNA implements PacAction {
             //add each path in arraylist [[],[],..]
             //TODO may need to clone grid for each getPath
             System.out.println("Starting node " + i);
-            PacCell[][] gridClone = gridClone(grid);
+            PacCell[][] gridClone = PacUtils.cloneGrid(grid);
             possibleSolution[i] = getPath(allNodes.get(i),gridClone);
         }
 
@@ -312,17 +322,5 @@ public class PacSimRNNA implements PacAction {
             System.out.println("NODE "+ i + "," + possibleSolution[shortest].get(i)+ "x,y = "+ possibleSolution[shortest].get(i).x +","+possibleSolution[shortest].get(i).y);
         }
         return possibleSolution[shortest];
-    }
-
-    private PacCell[][] gridClone(PacCell[][] grid) {
-        System.out.println("Rowwww "+ grid.length+", collll"+grid[0].length);
-        PacCell[][] gridClone = new PacCell[grid.length][grid[0].length];
-
-        for(int i = 0; i < grid.length; i++){
-            for(int j = 0; j < grid[0].length; j++){
-                gridClone[i][j] = grid[i][j].clone();
-            }
-        }
-        return gridClone;
     }
 }
