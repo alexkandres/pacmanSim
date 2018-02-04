@@ -10,6 +10,9 @@ public class PacSimRNNA implements PacAction {
     private List<Point> allNodes;
     private int simTime;
     private PacmanCell pc;
+    private long timeMilliStart;
+    private long timeMilliStop;
+
     //constructor should be formatted this way
     public PacSimRNNA(String fname) {
         PacSim sim = new PacSim( fname );
@@ -51,7 +54,9 @@ public class PacSimRNNA implements PacAction {
         if( path.isEmpty() ) {
             allNodes = PacUtils.findFood(grid);
             printFood(allNodes);
+            timeMilliStart = System.currentTimeMillis();
             path = getRNNASolutionBranch(grid);
+            System.out.println("Time to generate plan: "+(System.currentTimeMillis() - timeMilliStart)+" msec\n");
         }
 
         // take the next step on the current path
@@ -71,37 +76,24 @@ public class PacSimRNNA implements PacAction {
     }
 
     private List<Point> getRNNASolutionBranch(PacCell[][] grid) {
-
-
-
         PacCell[][] gridClone = PacUtils.cloneGrid(grid);
         List<PathGrid> pathGridList = getPossibleSolutions(gridClone);
         List<Point> bestPath = getBestPath(pathGridList);
-
         return bestPath;
     }
 
     private List<Point> getBestPath(List<PathGrid> pathGridList) {
         int shortest = 0;
         //find shortest int the list
-        System.out.println("PATHSIZE: "+pathGridList.get(0).path.size());
         for(int i = 1; i < pathGridList.size(); i++){
-            System.out.println("PATHSIZE: "+pathGridList.get(i).path.size());
             if(pathGridList.get(i).path.size() < pathGridList.get(shortest).path.size()){
                 shortest = i;
-                System.out.println("SHORTEST = " + "PATHSIZE " + pathGridList.get(i).path.size());
             }
         }
 
         //TODO may need to shift left
 //        Point point = pathGridList.get(shortest).path.remove(0);
 //        pathGridList.get(shortest).path.add(point);
-
-        //printing shortest path
-        for(int i = 0; i < pathGridList.get(shortest).path.size(); i++){
-            System.out.println(i + "NODE " + pathGridList.get(shortest).path.get(i));
-        }
-
         return pathGridList.get(shortest).path;
     }
 
@@ -115,13 +107,16 @@ public class PacSimRNNA implements PacAction {
         for(int i = 0; i < allFood.size();i++){
             PathGrid pathGridInit = pathGridClone(grid);
             expand(pathGridInit, allFood.get(i));
+            printSteps(pathGridInit.path,i);
             pathGridList.add(pathGridInit);
         }
+        System.out.println();
 
         //update and expand possible solutions
         while (gridsHaveFood(pathGridList)){
             for(int i = 0; i < pathGridList.size(); i++){
                 if(!PacUtils.foodRemains(pathGridList.get(i).grid)){
+                    printSteps(pathGridList.get(i).path, i);
                     continue;
                 }
                 printSteps(pathGridList.get(i).path, i);
@@ -149,7 +144,7 @@ public class PacSimRNNA implements PacAction {
 
     private void printSteps(List<Point> subPath, int k){
 
-        System.out.print(k + " : cost= [");
+        System.out.print(k + " : cost= "+subPath.size()+" : [");
         for(int i = 0; i < subPath.size(); i++){
             System.out.print("("+subPath.get(i).x+","+subPath.get(i).y+")");
         }
