@@ -9,7 +9,7 @@ public class PacSimRNNA implements PacAction {
     private List<Point> path;
     private List<Point> allNodes;
     private int simTime;
-
+    private PacmanCell pc;
     //constructor should be formatted this way
     public PacSimRNNA(String fname) {
         PacSim sim = new PacSim( fname );
@@ -39,7 +39,7 @@ public class PacSimRNNA implements PacAction {
         //2d array of grid
         //find pacman on the grid
         PacCell[][] grid = (PacCell[][]) state;
-        PacmanCell pc = PacUtils.findPacman( grid );
+        pc = PacUtils.findPacman( grid );
 
 
         // make sure Pac-Man is in this game
@@ -77,8 +77,9 @@ public class PacSimRNNA implements PacAction {
         System.out.println("PATHSIZE: "+pathGridList.get(0).path.size());
         for(int i = 1; i < pathGridList.size(); i++){
             System.out.println("PATHSIZE: "+pathGridList.get(i).path.size());
-            if(pathGridList.get(i).path.size() < pathGridList.get(i-1).path.size()){
+            if(pathGridList.get(i).path.size() < pathGridList.get(shortest).path.size()){
                 shortest = i;
+                System.out.println("SHORTEST = " + "PATHSIZE " + pathGridList.get(i).path.size());
             }
         }
 
@@ -98,7 +99,8 @@ public class PacSimRNNA implements PacAction {
         List<PathGrid> pathGridList = new ArrayList<>();
         List<Point> initPath = new ArrayList<>();
         //TODO change new Point() to be dynamic, add path to constructor
-        PathGrid grid = new PathGrid(gridClone, new Point(4,3), initPath);
+
+        PathGrid grid = new PathGrid(gridClone, new Point(pc.getX(),pc.getY()), initPath);
         List<Point> allFood = PacUtils.findFood(gridClone);
         for(int i = 0; i < allFood.size();i++){
             PathGrid pathGridInit = pathGridClone(grid);
