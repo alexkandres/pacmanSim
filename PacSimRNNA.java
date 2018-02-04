@@ -18,7 +18,7 @@ public class PacSimRNNA implements PacAction {
 
     // instantiate class instants
     public static void main( String[] args ) {
-        System.out.println("\nTSP using simple RNNA agent by Alex Andres:");
+        System.out.println("\nTSP using simple RNNA algorithm by Alex Andres:");
         System.out.println("\nMaze : " + args[ 0 ] + "\n" );
         new PacSimRNNA( args[ 0 ] );
     }
@@ -49,6 +49,8 @@ public class PacSimRNNA implements PacAction {
         // select a the nearest food using the city-block
         // measure and generate a path to that target
         if( path.isEmpty() ) {
+            allNodes = PacUtils.findFood(grid);
+            printFood(allNodes);
             path = getRNNASolutionBranch(grid);
         }
 
@@ -59,10 +61,18 @@ public class PacSimRNNA implements PacAction {
         return face;
     }
 
+    private void printFood(List<Point> allNodes) {
+        //for ea point print location
+
+        System.out.println("Food Array:\n");
+        for(int i = 0; i < allNodes.size(); i++)
+            System.out.println(i + " : " + "(" + allNodes.get(i).x + "," + allNodes.get(i).y + ")");
+        System.out.println();
+    }
+
     private List<Point> getRNNASolutionBranch(PacCell[][] grid) {
 
 
-        allNodes = PacUtils.findFood(grid);
 
         PacCell[][] gridClone = PacUtils.cloneGrid(grid);
         List<PathGrid> pathGridList = getPossibleSolutions(gridClone);
@@ -114,6 +124,8 @@ public class PacSimRNNA implements PacAction {
                 if(!PacUtils.foodRemains(pathGridList.get(i).grid)){
                     continue;
                 }
+                printSteps(pathGridList.get(i).path, i);
+
                 List<Point> allNearestFoods = getNearestFoods(pathGridList.get(i));
                 PathGrid pathGridClone = pathGridClone(pathGridList.get(i));
 
@@ -122,27 +134,34 @@ public class PacSimRNNA implements PacAction {
 
                 //create, expand and add to pathGridList
                 for(int j = 0; j < allNearestFoods.size(); j++){
-                    System.out.println( j+"Create new branch" + pathGridClone.currentPoint);
+//                    System.out.println( j+"Create new branch" + pathGridClone.currentPoint);
                     PathGrid newPathGrid = pathGridClone(pathGridClone);
                     expand(newPathGrid, allNearestFoods.get(j));
                     pathGridList.add(newPathGrid);
                 }
 
             }
+            System.out.println();
+            System.out.println();
         }
         return pathGridList;
     }
 
+    private void printSteps(List<Point> subPath, int k){
+
+        System.out.print(k + " : cost= [");
+        for(int i = 0; i < subPath.size(); i++){
+            System.out.print("("+subPath.get(i).x+","+subPath.get(i).y+")");
+        }
+        System.out.println("]");
+
+    }
     private void expand(PathGrid pathGrid, Point targetPoint) {
         List<Point> subPath;
         subPath = BFSPath.getPath(pathGrid.grid, pathGrid.currentPoint, targetPoint);
-        System.out.println("BEFORE "+pathGrid.path);
-        if(pathGrid == null)
-            System.out.println("pathGrid == null");
-        if(pathGrid.path == null)
-            System.out.println("path == null");
+//        System.out.println("BEFORE "+pathGrid.path);
         pathGrid.path.addAll(subPath);
-        System.out.println("AFTER "+pathGrid.path);
+//        System.out.println("AFTER "+pathGrid.path);
 
         //mark food as eaten
         while (!subPath.isEmpty()){
@@ -203,7 +222,7 @@ public class PacSimRNNA implements PacAction {
             List<Point> p1 = BFSPath.getPath(pathGrid.grid, pathGrid.currentPoint, foodListPoint.get(i));
             if (p1.size() == shortestPoint.size()){
                 allNearestFood.add(foodListPoint.get(i));
-                System.out.println("NEAREST FOODS" +foodListPoint.get(i));
+//                System.out.println("NEAREST FOODS" +foodListPoint.get(i));
             }
         }
         return allNearestFood;
